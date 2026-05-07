@@ -6,7 +6,7 @@ from database.repositories.ConditionRepository import ConditionRepository
 from database.repositories.ProgressRepository import ProgressRepository
 from database.repositories.TaskRepository import TaskRepository
 from database.repositories.UserRepository import UserRepository
-from keyboards.TaskKeyboards import back_to_profile_keyboard, confirm_retell_keyboard
+from keyboards.TaskKeyboards import back_to_profile_keyboard, confirm_retell_keyboard, back_to_task_menu_keyboard
 from schemas.schemas import CourseName, DifficultyLevel, ImprovizationTaskName
 from services.MessageFormatter import MessageFormatterFactory
 from states.TaskStates import TaskStates
@@ -71,7 +71,7 @@ async def task_handler_factory(
                                              reply_markup=confirm_retell_keyboard().as_markup()
                                              )
         else:
-            await anchor_manager.edit_anchor(message, reply_markup=back_to_profile_keyboard().as_markup())
+            await anchor_manager.edit_anchor(message, reply_markup=back_to_task_menu_keyboard().as_markup())
         await state.update_data(
             task_id=task.id,
             task_name=task.name,

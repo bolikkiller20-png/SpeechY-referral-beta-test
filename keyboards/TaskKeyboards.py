@@ -101,3 +101,14 @@ def confirm_retell_keyboard() -> InlineKeyboardBuilder:
     )
     return builder
 
+
+def back_to_task_menu_keyboard() -> InlineKeyboardBuilder:
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        InlineKeyboardButton(
+            text="Назад",
+            callback_data="complete_tasks",
+            style="primary"
+        )
+    )
+    return builder
