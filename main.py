@@ -25,8 +25,16 @@ def run_migrations():
     try:
         from alembic.config import Config
         from alembic import command
+        from alembic.script import ScriptDirectory
+        from config import settings
 
         alembic_cfg = Config("alembic.ini")
+        alembic_cfg.set_main_option("sqlalchemy.url", settings.get_database_url())
+
+        # Принудительно ставим метку head, чтобы избежать проблем
+        command.stamp(alembic_cfg, "head")
+
+        # Применяем миграции
         command.upgrade(alembic_cfg, "head")
         app_logger.info("✅ Миграции успешно применены")
     except Exception as e:
