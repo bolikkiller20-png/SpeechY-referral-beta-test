@@ -20,6 +20,21 @@ if sys.platform == 'win32':
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
+async def ensure_tables_exist():
+    """Временно: создает таблицы если их нет (костыль для Railway)"""
+    from sqlalchemy.ext.asyncio import create_async_engine
+    from database.base import Base
+    from config import settings
+
+    try:
+        engine = create_async_engine(settings.get_database_url())
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        await engine.dispose()
+        app_logger.info("✅ Таблицы проверены/созданы")
+    except Exception as e:
+        app_logger.error(f"Ошибка при проверке таблиц: {e}")
+
 def run_migrations():
     """Запускает миграции Alembic перед стартом бота."""
     try:
@@ -57,6 +72,8 @@ async def on_shutdown():
 
 async def main():
     app_logger.info("Инициализация бота...")
+    await ensure_tables_exist()
+
     run_migrations()
 
     message_scheduler.start()
