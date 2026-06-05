@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     DB_NAME: str
     EXP_FOR_IMPROVIZATION_TASKS: int
     DATABASE_URL: Optional[str] = None
+    SPEECHY_SALT: str
+    REFERRAL_CODE_LENGTH: int
 
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
@@ -44,6 +46,14 @@ class Settings(BaseSettings):
 
     def get_EXP_FOR_IMPROVIZATION_TASKS(self):
         return self.EXP_FOR_IMPROVIZATION_TASKS
+
+    def get_SPEECHY_SALT(self) -> str:
+        return self.SPEECHY_SALT
+
+
+    def get_REFERRAL_CODE_LENGTH(self) -> int:
+        return self.REFERRAL_CODE_LENGTH
+
 
 
 settings = Settings()

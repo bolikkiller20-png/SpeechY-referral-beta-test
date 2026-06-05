@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from database.models import Task, Condition
-from schemas.schemas import CourseName, ImprovizationTaskName
+from schemas.schemas import CourseName, ImprovizationTaskName, DictionTaskName
 
 
 class MessageFormatter(ABC):
@@ -44,6 +44,34 @@ class ImprovizationFormatter(MessageFormatter):
                 f"💡 Ты должен пересказать текст минимум за 1 минуту\n"
                 f"Как будешь готов нажми на кнопку ниже"
             )
+        elif task.name == ImprovizationTaskName.NEW_WORD:
+            return (
+                f"🎭 Задание: <b><i>{task.name}</i></b>\n\n"
+                f"📋 <i>{task.rules}</i>\n\n"
+                f"🎲 <b>{condition.condition}</b>\n\n"
+                f"Записывай голосовое длиной минимум в 1 минуту"
+            )
+
+
+class DictionFormatter(MessageFormatter):
+    def format_task_message(
+            self,
+            task: Task,
+            condition: Condition
+    ) -> str:
+        if task.name == DictionTaskName.TONGUE_TWISTER:
+            return (
+                f"🎭 Задание: <b><i>{task.name}</i></b>\n\n"
+                f"📋 <i>{task.rules}</i>\n\n"
+                f"🎲 <b>{condition.condition}</b>\n\n"
+            )
+        elif task.name == DictionTaskName.VOWELS_AND_CONSONANTS:
+            print("Зашли в согласные/гласныеч")
+            return (
+                f"🎭 Задание: <b><i>{task.name}</i></b>\n\n"
+                f"📋 <i>{task.rules}</i>\n\n"
+                f"🎲 <b>{condition.condition}</b>\n\n"
+            )
 
 
 class MessageFormatterFactory:
@@ -53,7 +81,7 @@ class MessageFormatterFactory:
 
     _formatters = {
         CourseName.IMPROVISATION: ImprovizationFormatter(),
-
+        CourseName.DICTION: DictionFormatter()
     }
 
     @classmethod

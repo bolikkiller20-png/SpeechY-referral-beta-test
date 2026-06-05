@@ -66,8 +66,9 @@ class AnchorMessageManager:
     async def edit_anchor(
             self,
             text: str,
-            reply_markup: Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, None] = None
-    ) -> Optional[Message]:  # ← Возвращаем Optional
+            reply_markup: Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, None] = None,
+            parse_mode: Optional[ParseMode] = ParseMode.HTML
+    ) -> Optional[Message]:
         anchor_id = await self.get_anchor_id()
         print(f"📌 edit_anchor вызван: anchor_id={anchor_id}, chat_id={self.chat_id}")
         if anchor_id:
@@ -77,7 +78,7 @@ class AnchorMessageManager:
                     chat_id=self.chat_id,
                     message_id=anchor_id,
                     reply_markup=reply_markup,
-                    parse_mode=ParseMode.HTML
+                    parse_mode=parse_mode
                 )
                 return msg
 

@@ -6,6 +6,9 @@ from database.repositories.ConditionRepository import ConditionRepository
 from database.repositories.CourseRepository import CourseRepository
 from database.repositories.NotificationRepository import NotificationRepository
 from database.repositories.ProgressRepository import ProgressRepository
+from database.repositories.PromoCodeRepository import PromoCodeRepository
+from database.repositories.PromoCodeUsageRepository import PromoCodeUsageRepository
+from database.repositories.ReferralRepository import ReferralRepository
 from database.repositories.TaskRepository import TaskRepository
 from database.repositories.UserRepository import UserRepository
 
@@ -22,6 +25,9 @@ class DbSessionMiddleware(BaseMiddleware):
             data["task_repo"] = TaskRepository(session)
             data["condition_repo"] = ConditionRepository(session)
             data["completed_task_repo"] = CompletedTaskRepository(session)
+            data["promo_code_repo"] = PromoCodeRepository(session)
+            data["referral_repo"] = ReferralRepository(session)
+            data["promo_code_usage_repo"] = PromoCodeUsageRepository(session)
             try:
                 result = await handler(event, data)
                 await session.commit()

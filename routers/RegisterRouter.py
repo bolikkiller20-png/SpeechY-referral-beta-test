@@ -161,7 +161,6 @@ async def customization_notifications_handler(
         await anchor_msg_manager.edit_anchor(profile_text, reply_markup=profile_keyboard().as_markup())
         await anchor_msg_manager.delete_user_message(message)
         await state.set_state(None)
-        print("Очистка состояния")
     except ValueError as e:
         await anchor_msg_manager.edit_anchor(str(e), reply_markup=get_skip_notifications_keyboard().as_markup())
         await anchor_msg_manager.delete_user_message(message)

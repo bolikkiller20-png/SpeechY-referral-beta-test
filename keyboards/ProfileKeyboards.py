@@ -12,8 +12,12 @@ def profile_keyboard() -> InlineKeyboardBuilder:
         InlineKeyboardButton(text="Настроить уведомления", callback_data="configure_notifications", style="primary")
     )
     builder.row(
+        InlineKeyboardButton(text="Реферальная система", callback_data="referral_system", style="primary")
+    )
+    builder.row(
         InlineKeyboardButton(text="Прислать голосовое", callback_data="send_voice_message", style="success")
     )
+
     return builder
 
 

@@ -65,6 +65,7 @@ async def task_handler_factory(
 
         formatter = MessageFormatterFactory.get_formatter(course_name)
         message = formatter.format_task_message(task, condition)
+        print("message: ", message)
         if task.name == ImprovizationTaskName.RETELL:
 
             await anchor_manager.edit_anchor(message,

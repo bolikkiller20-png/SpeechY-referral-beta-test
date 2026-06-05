@@ -8,7 +8,6 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from config import settings
 from database import db
-from database.services.data_seeder import DataSeeder
 from database.services.notification_restore import restore_all_notifications
 from middlewares.anchor import AnchorManagerMiddleware
 from middlewares.db import DbSessionMiddleware
@@ -50,7 +49,6 @@ async def on_shutdown():
 
 async def main():
     app_logger.info("Инициализация бота...")
-
     run_migrations()
 
     message_scheduler.start()
@@ -84,8 +82,7 @@ async def main():
 
         # 6. Запускаем поллинг
         await dp.start_polling(
-            bot,
-            allowed_updates=dp.resolve_used_update_types()
+            bot
         )
     finally:
         await bot.session.close()

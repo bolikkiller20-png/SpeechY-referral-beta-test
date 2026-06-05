@@ -1,16 +1,29 @@
 from datetime import date, timedelta
 from typing import List, Optional
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
 from schemas.schemas import StreakStatus
+from utils.ReferralUtils import ReferralUtils
 
 
 class UserRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    async def update_trials_amount(
+            self,
+            user_id: int,
+            delta: int
+    ) -> int:
+        res = await self.session.execute(
+            update(User)
+            .where(User.id == user_id)
+            .values(trial_amount=User.trial_amount + delta)
+        )
+        return res.rowcount
 
     async def get_by_telegram_id(self, telegram_id: int) -> Optional[User]:
         """
@@ -26,6 +39,18 @@ class UserRepository:
         user = result.scalar_one_or_none()
         if not user:
             return None
+        return user
+
+    async def get_by_id(
+            self,
+            id: int
+    ) -> Optional[User]:
+        res = await self.session.execute(
+            select(User).where(User.id == id)
+        )
+        user = res.scalar_one_or_none()
+        if not user:
+            raise ValueError("Пользователь не найден")
         return user
 
     async def create(self, **kwargs) -> User:
@@ -133,7 +158,20 @@ class UserRepository:
         )
         return result.scalars().all()
 
+    async def update_user_pro_discount(
+            self,
+            user_id: int,
+            new_discount: int
+    ) -> int:
+        user = await self.get_by_id(user_id)
+        if user.pro_discount < new_discount:
+            res = await self.session.execute(
+                update(User)
+                .where(User.id == user_id)
+                .values(pro_discount=new_discount)
 
-
-
+            )
+            return res.rowcount
+        else:
+            return 0
 

@@ -47,11 +47,13 @@ class ProfileUtils:
                 notifications_display = f"(<i>{times_str}</i>)"
             else:
                 notifications_display = "(выключены)"
-        text = "📊 <b>Твой профиль</b>\n\n" \
-            f"👤 Имя: {user.name}\n"\
-            f"🔥 Серия: {user.series_of_days_amount} дней\n"\
-            f"🔔 Уведомления: {'✅ <b>Вкл</b>' if user.notifications else '❌ <b>Выкл</b>'} {notifications_display}\n"\
-            f"\n📚 <b>Твой прогресс:</b>\n"\
+
+        text = "📊 <b><i>Твой профиль</i></b>\n\n" \
+            f"👤 Имя: <b>{user.name}</b>\n"\
+            f"🔥 Серия: <b>{user.series_of_days_amount} дней</b>\n"\
+            f"🔔 Уведомления: {'✅ <b>Вкл</b>' if user.notifications else '❌ <b>Выкл</b>'} {notifications_display}\n\n" \
+               f"⭐️ Количество попыток Pro-версии: <b>{user.trial_amount}</b>\n"\
+            f"\n📚 <b><i>Твой прогресс:</i></b>\n"\
             f"{courses_progress_text}"\
             f""
         return text

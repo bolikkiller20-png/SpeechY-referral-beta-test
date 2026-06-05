@@ -12,7 +12,7 @@ from database.repositories.UserRepository import UserRepository
 from keyboards.TaskKeyboards import retry_voice_message_keyboard, task_menu_keyboard, course_task_menu_keyboard, \
     confirm_retell_keyboard
 from logger_config import app_logger
-from schemas.schemas import CourseName, StreakStatus, ImprovizationTaskName
+from schemas.schemas import CourseName, StreakStatus, ImprovizationTaskName, DictionTaskName
 from services.TaskService import task_handler_factory
 from states.TaskStates import TaskStates
 from utils.TaskUtils import TaskUtils
@@ -45,6 +45,7 @@ async def task_improvisation_handler(
         state: FSMContext,
         anchor_manager: AnchorMessageManager
 ):
+    app_logger.debug("Пришли в импровизацию")
     await task_handler_factory(
         callback=callback,
         task_repo=task_repo,
@@ -54,6 +55,30 @@ async def task_improvisation_handler(
         state=state,
         anchor_manager=anchor_manager,
         course_name=CourseName.IMPROVISATION
+    )
+
+
+@task_router.callback_query(F.data == "task_diction")
+async def task_diction_handler(
+        callback: CallbackQuery,
+        task_repo: TaskRepository,
+        condition_repo: ConditionRepository,
+        progress_repo: ProgressRepository,
+        user_repo: UserRepository,
+        state: FSMContext,
+        anchor_manager: AnchorMessageManager
+):
+    app_logger.debug("Зашли в дикцию")
+
+    await task_handler_factory(
+        callback=callback,
+        task_repo=task_repo,
+        condition_repo=condition_repo,
+        progress_repo=progress_repo,
+        user_repo=user_repo,
+        state=state,
+        anchor_manager=anchor_manager,
+        course_name=CourseName.DICTION
     )
 
 
@@ -69,7 +94,16 @@ async def handle_voice(
     print("Зашли в хендлер обработки голосовго сообщения")
     duration = message.voice.duration
     print("duration", duration)
-    if 60 <= duration <= 180:
+    data = await state.get_data()
+    task_name = data.get('task_name')
+    begin_duration = 60
+    end_duration = 180
+    if task_name == DictionTaskName.TONGUE_TWISTER:
+        begin_duration = 10
+        end_duration = 90
+    elif task_name == DictionTaskName.VOWELS_AND_CONSONANTS:
+        begin_duration = 30
+    if begin_duration <= duration <= end_duration:
 
         await anchor_manager.send_anchor(
             f"Голосовое получил!\nСохраняем его?",

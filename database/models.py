@@ -6,7 +6,7 @@ from sqlalchemy import BigInteger, String, ForeignKey, DateTime, func, Time, Boo
 from sqlalchemy.orm import Mapped, mapped_column
 
 from database.base import Base
-from schemas.schemas import DifficultyLevel
+from schemas.schemas import DifficultyLevel, PromoCodeTypes
 
 
 class User(Base):
@@ -19,6 +19,8 @@ class User(Base):
     is_admin: Mapped[bool] = mapped_column(default=False)
     series_of_days_amount: Mapped[int] = mapped_column(default=0)
     notifications: Mapped[bool] = mapped_column(default=False)
+    trial_amount: Mapped[int] = mapped_column(default=1, nullable=False)
+    pro_discount: Mapped[int]
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         server_default=func.now(),
@@ -143,6 +145,48 @@ class UserAnchor(Base):
         DateTime,
         server_default=func.now(),
         nullable=True
+    )
+
+
+class PromoCode(Base):
+    __tablename__ = "promo_codes"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
+    code: Mapped[str] = mapped_column(unique=True, index=True)
+    reward_type: Mapped[PromoCodeTypes] = mapped_column()
+    reward_value: Mapped[int] = mapped_column()
+    max_uses: Mapped[int] = mapped_column()
+    used_count: Mapped[int] = mapped_column(default=0)
+    expires_at: Mapped[datetime] = mapped_column(nullable=True)
+    user_limit: Mapped[int] = mapped_column(default=1)
+    is_active: Mapped[bool] = mapped_column(nullable=True, default=False)
+    is_referral: Mapped[bool] = mapped_column(default=False)
+
+
+class Referral(Base):
+    __tablename__ = "referrals"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    promo_code_id: Mapped[int] = mapped_column(ForeignKey("promo_codes.id"))
+    inviter_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    invited_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        server_default=func.now(),
+        nullable=True
+    )
+
+
+class PromoCodeUsage(Base):
+    __tablename__ = "promo_code_usages"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    promo_code_id: Mapped[int] = mapped_column(ForeignKey("promo_codes.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+
+    used_at: Mapped[datetime] = mapped_column(DateTime,
+                                              server_default=func.now())
+    __table_args__ = (
+        UniqueConstraint('promo_code_id', 'user_id', name='unique_user_promo_usage'),
     )
 
 

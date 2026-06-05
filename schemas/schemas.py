@@ -23,4 +23,15 @@ class StreakStatus(str, Enum):
 class ImprovizationTaskName(str, Enum):
     DESCRIPTION_OF_THE_ITEM = "Описание предмета"
     RETELL = "Пересказ"
+    NEW_WORD = "Новое слово"
+
+
+class DictionTaskName(str, Enum):
+    TONGUE_TWISTER = "Скороговорка"
+    VOWELS_AND_CONSONANTS = "Гласные/согласные"
+
+
+class PromoCodeTypes(str, Enum):
+    DISCOUNT = "discount"
+    TRIALS = "trials"
 
