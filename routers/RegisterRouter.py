@@ -32,6 +32,7 @@ async def name_handler(
 ):
     user = await user_repo.get_by_telegram_id(message.from_user.id)
     if not user:
+        print("Зашли куда надо")
         new_user, created = await user_repo.get_or_create(
             telegram_id=message.from_user.id,
             name="",
