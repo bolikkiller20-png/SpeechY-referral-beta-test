@@ -37,15 +37,13 @@ async def ensure_tables_exist():
 
 async def update_seed_data():
     """Заполняет базу данных начальными данными (курсы, задания, промокоды)"""
-    from database.session import get_async_session
-    from database.seed import DataSeeder
+    from database.services.data_seeder import DataSeeder
 
     try:
-        async for session in get_async_session():
+        async with db.get_session() as session:
             seeder = DataSeeder(session)
             await seeder.update_seed_data()
             app_logger.info("✅ Начальные данные успешно загружены")
-            break
     except Exception as e:
         app_logger.error(f"❌ Ошибка при загрузке начальных данных: {e}")
         raise
