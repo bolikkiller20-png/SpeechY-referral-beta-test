@@ -15,7 +15,6 @@ from routers import routers
 from logger_config import app_logger
 from services.Scheduler import message_scheduler
 
-
 if sys.platform == 'win32':
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
@@ -35,12 +34,28 @@ async def ensure_tables_exist():
     except Exception as e:
         app_logger.error(f"Ошибка при проверке таблиц: {e}")
 
+
+async def update_seed_data():
+    """Заполняет базу данных начальными данными (курсы, задания, промокоды)"""
+    from database.session import get_async_session
+    from database.seed import DataSeeder
+
+    try:
+        async for session in get_async_session():
+            seeder = DataSeeder(session)
+            await seeder.update_seed_data()
+            app_logger.info("✅ Начальные данные успешно загружены")
+            break
+    except Exception as e:
+        app_logger.error(f"❌ Ошибка при загрузке начальных данных: {e}")
+        raise
+
+
 def run_migrations():
     """Запускает миграции Alembic перед стартом бота."""
     try:
         from alembic.config import Config
         from alembic import command
-        from alembic.script import ScriptDirectory
         from config import settings
 
         alembic_cfg = Config("alembic.ini")
@@ -72,10 +87,17 @@ async def on_shutdown():
 
 async def main():
     app_logger.info("Инициализация бота...")
+
+    # 1. Создаем таблицы если их нет
     await ensure_tables_exist()
 
+    # 2. Запускаем миграции
     run_migrations()
 
+    # 3. Заполняем начальными данными (курсы, задания, промокоды)
+    await update_seed_data()
+
+    # 4. Запускаем планировщик
     message_scheduler.start()
 
     BOT_TOKEN = settings.get_bot_token()
@@ -106,9 +128,7 @@ async def main():
             await restore_all_notifications(bot, notification_repo)
 
         # 6. Запускаем поллинг
-        await dp.start_polling(
-            bot
-        )
+        await dp.start_polling(bot)
     finally:
         await bot.session.close()
 
