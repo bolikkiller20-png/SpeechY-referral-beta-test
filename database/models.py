@@ -19,8 +19,8 @@ class User(Base):
     is_admin: Mapped[bool] = mapped_column(default=False)
     series_of_days_amount: Mapped[int] = mapped_column(default=0)
     notifications: Mapped[bool] = mapped_column(default=False)
-    trial_amount: Mapped[int] = mapped_column(default=1, nullable=False)
-    pro_discount: Mapped[int]
+    trial_amount: Mapped[int] = mapped_column(default=1, nullable=True)
+    pro_discount: Mapped[int] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         server_default=func.now(),
