@@ -40,10 +40,11 @@ async def update_seed_data():
     from database.services.data_seeder import DataSeeder
 
     try:
-        async with db.get_session() as session:
-            seeder = DataSeeder(session)
-            await seeder.update_seed_data()
-            app_logger.info("✅ Начальные данные успешно загружены")
+        session = await db.get_session()  # Получаем сессию через await
+        seeder = DataSeeder(session)
+        await seeder.update_seed_data()
+        await session.close()  # Закрываем сессию
+        app_logger.info("✅ Начальные данные успешно загружены")
     except Exception as e:
         app_logger.error(f"❌ Ошибка при загрузке начальных данных: {e}")
         raise
