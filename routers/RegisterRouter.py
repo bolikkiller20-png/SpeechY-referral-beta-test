@@ -30,53 +30,56 @@ async def name_handler(
         course_repo: CourseRepository,
         progress_repo: ProgressRepository
 ):
-    user = await user_repo.get_by_telegram_id(message.from_user.id)
-    if not user:
-        print("Зашли куда надо")
-        new_user, created = await user_repo.get_or_create(
-            telegram_id=message.from_user.id,
-            name="",
-            username=message.from_user.username or "",
-            is_admin=False,
-            series_of_days_amount=0,
-            notifications=False
-        )
-        anchor_msg_manager = AnchorMessageManager(
-            user_id=new_user.id,
-            session=session,
-            chat_id=message.chat.id,
-            bot=message.bot,
-            state=state
-        )
-        await anchor_msg_manager.delete_user_message(message)
-        sent = await anchor_msg_manager.send_anchor(
-            "Привет!\n"
-            "Меня зовут SpeechY. Я стану твоим проводником в мир <b>уверенной</b> и <i>красивой</i> речи\n"
-            "Давай знакомиться. <i><u>Как тебя зовут?</u></i>"
-        )
-        await anchor_msg_manager.save_anchor(sent.message_id)
+    try:
+        user = await user_repo.get_by_telegram_id(message.from_user.id)
+        if not user:
+            print("Зашли куда надо")
+            new_user, created = await user_repo.get_or_create(
+                telegram_id=message.from_user.id,
+                name="",
+                username=message.from_user.username or "",
+                is_admin=False,
+                series_of_days_amount=0,
+                notifications=False
+            )
+            anchor_msg_manager = AnchorMessageManager(
+                user_id=new_user.id,
+                session=session,
+                chat_id=message.chat.id,
+                bot=message.bot,
+                state=state
+            )
+            await anchor_msg_manager.delete_user_message(message)
+            sent = await anchor_msg_manager.send_anchor(
+                "Привет!\n"
+                "Меня зовут SpeechY. Я стану твоим проводником в мир <b>уверенной</b> и <i>красивой</i> речи\n"
+                "Давай знакомиться. <i><u>Как тебя зовут?</u></i>"
+            )
+            await anchor_msg_manager.save_anchor(sent.message_id)
+            await state.set_state(UserStates.name)
+
+        if user:
+            anchor_msg_manager = AnchorMessageManager(
+                user_id=user.id,
+                session=session,
+                chat_id=message.chat.id,
+                bot=message.bot,
+                state=state
+            )
+            await anchor_msg_manager.delete_user_message(message)
+            print("Сработало условие")
+            text = await ProfileUtils.get_profile_text(
+                message, user_repo, notification_repo, progress_repo, course_repo
+            )
+            await anchor_msg_manager.send_anchor(
+                text=text,
+                reply_markup=profile_keyboard().as_markup()
+            )
+            return
+
         await state.set_state(UserStates.name)
-
-    if user:
-        anchor_msg_manager = AnchorMessageManager(
-            user_id=user.id,
-            session=session,
-            chat_id=message.chat.id,
-            bot=message.bot,
-            state=state
-        )
-        await anchor_msg_manager.delete_user_message(message)
-        print("Сработало условие")
-        text = await ProfileUtils.get_profile_text(
-            message, user_repo, notification_repo, progress_repo, course_repo
-        )
-        await anchor_msg_manager.send_anchor(
-            text=text,
-            reply_markup=profile_keyboard().as_markup()
-        )
-        return
-
-    await state.set_state(UserStates.name)
+    except Exception as e:
+        print(str(e))
 
 
 @register_router.message(UserStates.name)
