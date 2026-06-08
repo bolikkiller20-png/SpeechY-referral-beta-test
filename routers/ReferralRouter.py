@@ -154,6 +154,8 @@ async def process_promo_code_handler(
             reply_markup=back_to_referral_system_menu()
         )
         await anchor_manager.delete_user_message(message)
+    except Exception as e:
+        print(str(e))
 
 
 
