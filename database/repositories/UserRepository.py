@@ -164,12 +164,13 @@ class UserRepository:
             new_discount: int
     ) -> int:
         user = await self.get_by_id(user_id)
+        if user.pro_discount is None:
+            user.pro_discount = 0
         if user.pro_discount < new_discount:
             res = await self.session.execute(
                 update(User)
                 .where(User.id == user_id)
                 .values(pro_discount=new_discount)
-
             )
             return res.rowcount
         else:
