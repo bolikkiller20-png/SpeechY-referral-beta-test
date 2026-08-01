@@ -176,3 +176,7 @@ class UserRepository:
         else:
             return 0
 
+    async def get_user_trials_amount(self, telegram_id: int) -> Optional[int]:
+        user = await self.get_by_telegram_id(telegram_id)
+        return user.trial_amount
+

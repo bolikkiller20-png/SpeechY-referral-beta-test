@@ -15,7 +15,7 @@ def profile_keyboard() -> InlineKeyboardBuilder:
         InlineKeyboardButton(text="Реферальная система", callback_data="referral_system", style="primary")
     )
     builder.row(
-        InlineKeyboardButton(text="Прислать голосовое", callback_data="send_voice_message", style="success")
+        InlineKeyboardButton(text="VIP-версия", callback_data="vip", style="success")
     )
 
     return builder
